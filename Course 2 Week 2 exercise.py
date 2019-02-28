@@ -2,14 +2,12 @@ import numpy as np
 from numpy.linalg import inv
 
 def predict_x(x, u, t_delta, F, G):
-    #print(x, u, t_delta, F, G)
     return np.matmul(F, x) + np.matmul(G, u)
 
 def predict_P(F, P, L, Q):
     return np.matmul(np.matmul(F, P),F.T) + np.matmul(np.matmul(L, Q),L.T)
 
 def optimal_gain(P, H, M, R):
-    #============ finish function ============#
     return np.matmul(np.matmul(P, H.T),inv(np.matmul(H,np.matmul(P,H.T))+np.matmul(M,np.matmul(R,M.T))))
 
 def main():
@@ -30,24 +28,21 @@ def main():
     Q = np.matrix([[0.1,0],[0,0.1]])
     R = np.matrix([[0.01]])
    
+
     #Compute predictions
     x_pred = predict_x(x_cor, u, t_delta, F, G)
     P_pred = predict_P(F, P_cor, L, Q)
-    #print(x_pred,P_pred)
-    
+        
     #Compute optimal gain
     H = np.matrix([[S/((D-x_pred[0,0])**2+S**2),0]])
     K = optimal_gain(P_pred, H, M, R)
-    #print(H,K)
-    
+       
     #Compute correction
     y_pred = np.degrees(np.arctan(S/(D-x_pred[0,0])))
     x_cor = x_pred + np.matmul(K,(y - y_pred))
     P_cor = np.multiply((1 - np.matmul(K,H)),P_pred)
     print(x_cor)
     print(P_pred)
-    #print(P_cor)
-    #print(1 - np.matmul(K,H))
 
 if __name__ == "__main__":
     main()
